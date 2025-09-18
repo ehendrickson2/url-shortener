@@ -8,18 +8,22 @@ import (
 )
 
 func ShortenURL(url string) (string, error) {
-	if url == "" {
-		return "", errors.New("URL cannot be empty")
-	}
-	// Use current timestamp to ensure uniqueness
-	ts := time.Now().UnixNano()
-	ts_bytes := []byte(fmt.Sprintf("%d", ts))
-	ts_encoded := base64.URLEncoding.EncodeToString(ts_bytes)
+    if url == "" {
+        return "", errors.New("URL cannot be empty")
+    }
+    // Use current timestamp to ensure uniqueness
+    ts := time.Now().UnixNano()
+    ts_bytes := []byte(fmt.Sprintf("%d", ts))
+    ts_encoded := base64.URLEncoding.EncodeToString(ts_bytes)
 
-	// Simple shortening logic: base64 encode the URL and take the first 8 characters
-	encoded := base64.URLEncoding.EncodeToString([]byte(url)) + ts_encoded
-	encoded = encoded[:len(encoded)-2] // Remove padding
-	shortened := encoded[:8]
+    url_encoded := base64.URLEncoding.EncodeToString([]byte(url))
 
-	return shortened, nil
+    // Concatenate the byte values of url_encoded and ts_encoded
+    combined := append([]byte(url_encoded), []byte(ts_encoded)...)
+
+    // Base64 encode the combined bytes and take the first 8 characters
+    final_encoded := base64.URLEncoding.EncodeToString(combined)
+    shortened := final_encoded[:8]
+
+    return shortened, nil
 }

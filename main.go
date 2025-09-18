@@ -42,7 +42,7 @@ func main() {
 		url := req.FormValue("url")
 		shortened, err := utils.ShortenURL(url)
 		if err != nil {
-			http.Error(writer, "Failed to shorten URL: "+err.Error(), http.StatusBadRequest)
+			http.Error(writer, "Failed to shorten URL: " + err.Error(), http.StatusBadRequest)
 			return
 		}
 		url = DOMAIN + "/" + shortened
@@ -57,9 +57,9 @@ func main() {
 
 	fmt.Println("Server is running on http://localhost:8080")
 
-	err := srv.ListenAndServe()
-	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal("Error starting server:", err)
+	serv_err := srv.ListenAndServe()
+	if serv_err != nil && !errors.Is(serv_err, http.ErrServerClosed) {
+		log.Fatal("Error starting server:", serv_err)
 	}
 	
 }
