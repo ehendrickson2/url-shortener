@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"url-shortener/utils"
+
+	"github.com/ehendrickson2/url-shortener/utils"
 )
 
 /* PageData holds data to be passed to templates

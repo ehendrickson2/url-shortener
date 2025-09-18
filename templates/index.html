@@ -8,6 +8,9 @@
   <body>
     <!-- Here we have a templated value of .Name, passed in from Go -->
     <h1>Hello {{ .Name }}</h1>
-    <input type="text" id="url" name="url" placeholder="Enter a URL">
+    <form action="/shorten" method="post">
+        <input type="text" id="url" name="url" placeholder="Enter a URL">
+        <input type="submit" value="Shorten">
+    </form>
   </body>
 </html>
