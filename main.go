@@ -4,18 +4,27 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/ehendrickson2/url-shortener/utils"
+	"github.com/joho/godotenv"
 )
 
 /* PageData holds data to be passed to templates
-Look into putting structs into root/models/ */
+Look into putting structs into project_root/models/ */
 type PageData struct {
 	Name string
 }
 
 func main() {
+	env_err := godotenv.Load()
+	if env_err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	
+	// Load templates
 	tmpl := template.Must(template.New("").ParseGlob("templates/*.html"))
 
 	router := http.NewServeMux()
@@ -28,6 +37,7 @@ func main() {
 
 	router.HandleFunc("/shorten", func(writer http.ResponseWriter, req *http.Request) {
 		// Shorten the provided URL, store it and return it to our UI
+		DOMAIN := os.Getenv("DOMAIN")
 		req.ParseForm()
 		url := req.FormValue("url")
 		shortened, err := utils.ShortenURL(url)
@@ -35,7 +45,8 @@ func main() {
 			http.Error(writer, "Failed to shorten URL: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		fmt.Fprintf(writer, "Shortened URL: %s", shortened)
+		url = DOMAIN + "/" + shortened
+		fmt.Fprintf(writer, "Shortened URL: %s", url)
 	})
 
 	// Put endpoints above server start
@@ -48,7 +59,7 @@ func main() {
 
 	err := srv.ListenAndServe()
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		fmt.Println("Error starting server:", err)
+		log.Fatal("Error starting server:", err)
 	}
 	
 }
