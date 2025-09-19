@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -89,7 +88,7 @@ func main() {
 		Handler: router,
 	}
 
-	fmt.Println("Server is running on http://localhost:8080")
+	log.Println("Server is running at", DOMAIN)
 
 	serv_err := srv.ListenAndServe()
 	if serv_err != nil && !errors.Is(serv_err, http.ErrServerClosed) {
