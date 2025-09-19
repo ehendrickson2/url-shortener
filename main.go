@@ -51,9 +51,7 @@ func main() {
 	router := http.NewServeMux()
 
 	router.HandleFunc("GET /{$}", func(writer http.ResponseWriter, req *http.Request) {
-		tmpl.ExecuteTemplate(writer, "index.html", PageData{
-			ShortenedURL: "User!",
-		})
+		tmpl.ExecuteTemplate(writer, "index.html", nil)
 	})
 
 	router.HandleFunc("/shorten", func(writer http.ResponseWriter, req *http.Request) {
