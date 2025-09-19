@@ -7,9 +7,6 @@
   </head>
   <body>
     <h1 style="font-size: 2rem; margin-bottom: 1rem;">URL Shortener</h1>
-    <form action="/shorten" method="post">
-        <input type="text" id="url" name="url" placeholder="Enter your link here">
-        <input type="submit" value="Shorten">
-    </form>
+    <p>Your shortened URL is: <a href="{{ .ShortenedURL }}">{{ .ShortenedURL }}</a></p>
   </body>
 </html>

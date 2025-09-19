@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"crypto/sha256"
 	"database/sql"
 	"encoding/base64"
 	"errors"
@@ -13,7 +14,27 @@ func ShortenURL(url string) (string, error) {
     if url == "" {
         return "", errors.New("URL cannot be empty")
     }
-    // Use current timestamp to ensure uniqueness
+
+	db, db_err := sql.Open("sqlite3", "./urls.db")
+	if db_err != nil {
+		return "", db_err
+	}
+	defer db.Close()
+
+	// Check if the original_url already exists
+	var existing_shortened string
+	query := `SELECT shortened_url FROM urls WHERE original_url = ?`
+	exists_err := db.QueryRow(query, url).Scan(&existing_shortened)
+	if exists_err == nil {
+		// Found existing shortcode
+		return existing_shortened, nil
+	} else if exists_err != sql.ErrNoRows {
+		return "", exists_err
+	}
+
+	/* shortcode not found, generate a new one
+	Generate a unique shortened URL using SHA-256 and Base64 encoding
+	Combine the URL with the current timestamp to ensure uniqueness */
     ts := time.Now().UnixNano()
     ts_bytes := []byte(fmt.Sprintf("%d", ts))
     ts_encoded := base64.URLEncoding.EncodeToString(ts_bytes)
@@ -23,15 +44,12 @@ func ShortenURL(url string) (string, error) {
     // Concatenate the byte values of url_encoded and ts_encoded
     combined := append([]byte(url_encoded), []byte(ts_encoded)...)
 
-    // Base64 encode the combined bytes and take the first 8 characters
-    final_encoded := base64.URLEncoding.EncodeToString(combined)
-    shortened := final_encoded[:8]
+	// Hash the combined bytes using SHA-256
+	hash := sha256.Sum256(combined)
 
-	db, db_err := sql.Open("sqlite3", "./urls.db")
-	if db_err != nil {
-		return "", db_err
-	}
-	defer db.Close()
+    // Base64 encode the hash and take the first 8 characters
+    final_encoded := base64.URLEncoding.EncodeToString(hash[:])
+    shortened := final_encoded[:8]
 
 	insert_sql := `INSERT INTO urls (original_url, shortened_url) VALUES (?, ?)`
 	_, err := db.Exec(insert_sql, url, shortened)

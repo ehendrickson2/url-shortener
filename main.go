@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/ehendrickson2/url-shortener/utils"
 	"github.com/joho/godotenv"
@@ -17,7 +18,7 @@ import (
 /* PageData holds data to be passed to templates
 Look into putting structs into project_root/models/ */
 type PageData struct {
-	Name string
+	ShortenedURL string
 }
 
 func main() {
@@ -34,7 +35,7 @@ func main() {
 
 	create_table_sql := `CREATE TABLE IF NOT EXISTS urls (
 		"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		"original_url" TEXT,
+		"original_url" TEXT UNIQUE,
 		"shortened_url" TEXT
 	  );`
 
@@ -51,7 +52,7 @@ func main() {
 
 	router.HandleFunc("GET /{$}", func(writer http.ResponseWriter, req *http.Request) {
 		tmpl.ExecuteTemplate(writer, "index.html", PageData{
-			Name: "User!",
+			ShortenedURL: "User!",
 		})
 	})
 
@@ -60,14 +61,21 @@ func main() {
 		DOMAIN := os.Getenv("DOMAIN")
 		req.ParseForm()
 		url := req.FormValue("url")
+		if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
+			url = "http://" + url
+		}
 		shortened, err := utils.ShortenURL(url)
 		if err != nil {
 			http.Error(writer, "Failed to shorten URL: " + err.Error(), http.StatusBadRequest)
 			return
 		}
 		url = DOMAIN + "/" + shortened
-		fmt.Fprintf(writer, "Shortened URL: %s", url)
+		tmpl.ExecuteTemplate(writer, "shorten.html", PageData{
+			ShortenedURL: url,
+		})
 	})
+
+	router.HandleFunc("/", utils.RedirectHandler)
 
 	// Put endpoints above server start
 	srv := http.Server{
