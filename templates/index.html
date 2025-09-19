@@ -1,15 +1,78 @@
 <!DOCTYPE html>
-<html lang="en" class="h-screen" style="color-scheme: dark; text-align: center; font-family: Poppins, sans;">
+<html lang="en" style="color-scheme: dark; text-align: center; font-family: Poppins, sans;">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>URL Shortener</title>
+    <style>
+      body {
+        min-height: 100vh;
+        padding-top: 8rem;
+        background: #18181b;
+        color: #f1f5f9;
+        font-family: Poppins, sans-serif;
+        margin: 0;
+      }
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3rem;
+      }
+      h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 2rem;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        background: #23272f;
+        padding: 2rem 2.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 16px 0 rgba(20,184,166,0.08);
+      }
+      input[type="text"] {
+        width: 320px;
+        padding: 0.75rem 1rem;
+        border: 2px solid #14b8a6;
+        border-radius: 0.5rem;
+        font-size: 1.125rem;
+        background: #18181b;
+        color: #f1f5f9;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      input[type="text"]:focus {
+        border-color: #38bdf8;
+      }
+      input[type="submit"] {
+        background: #14b8a6;
+        color: #fff;
+        border: 3px solid #14b8a6;
+        border-radius: 0.5rem;
+        font-size: 1.125rem;
+        font-weight: bold;
+        padding: 0.5rem 1.5rem;
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+      }
+      input[type="submit"]:hover {
+        background: #0f766e;
+        border-color: #0f766e;
+      }
+    </style>
   </head>
   <body>
-    <h1 style="font-size: 2rem; margin-bottom: 1rem;">URL Shortener</h1>
-    <form action="/shorten" method="post">
-        <input type="text" id="url" name="url" placeholder="Enter your link here">
+    <main>
+      <h1>URL Shortener</h1>
+      <form action="/shorten" method="post">
+        <input type="text" id="url" name="url" placeholder="Enter your link here" autocomplete="off" required>
         <input type="submit" value="Shorten">
-    </form>
+      </form>
+    </main>
   </body>
 </html>

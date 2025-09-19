@@ -1,12 +1,84 @@
 <!DOCTYPE html>
-<html lang="en" class="h-screen" style="color-scheme: dark; text-align: center; font-family: Poppins, sans;">
+<html lang="en" style="color-scheme: dark; text-align: center; font-family: Poppins, sans;">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>URL Shortener</title>
+    <style>
+      body {
+        min-height: 100vh;
+        padding-top: 8rem;
+        background: #18181b;
+        color: #f1f5f9;
+        font-family: Poppins, sans-serif;
+        margin: 0;
+      }
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3rem;
+      }
+      h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 2rem;
+      }
+      a {
+        text-decoration: none;
+        background: none;
+        color: #38bdf8;
+        transition: color 0.2s;
+      }
+      a:hover {
+        color: #0ea5e9;
+      }
+      h3 {
+        font-size: 1.25rem;
+        margin: 1.5rem 0;
+      }
+      .divider {
+        width: 100%;
+        max-width: 525px;
+        border-bottom: 2px solid #14b8a6;
+        margin: 1rem 0;
+      }
+      .copy-btn {
+        background: #14b8a6;
+        color: #fff;
+        border: 3px solid #14b8a6;
+        border-radius: 0.5rem;
+        font-size: 1.125rem;
+        font-weight: bold;
+        padding: 0.5rem 1.5rem;
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+      }
+      .copy-btn:hover {
+        background: #0f766e;
+        border-color: #0f766e;
+      }
+    </style>
   </head>
   <body>
-    <h1 style="font-size: 2rem; margin-bottom: 1rem;">URL Shortener</h1>
-    <p>Your shortened URL is: <a href="{{ .ShortenedURL }}">{{ .ShortenedURL }}</a></p>
+    <main>
+      <h1><a href="/">URL Shortener</a></h1>
+      <div>
+        <h3>Your shortened URL is: <a href="{{ .ShortenedURL }}">{{ .ShortenedURL }}</a></h3>
+        <div class="divider"></div>
+      </div>
+      <button class="copy-btn" onclick="copyURL(this, '{{ .ShortenedURL }}')">Copy</button>
+    </main>
+    <script>
+      function copyURL(btn, url) {
+        navigator.clipboard.writeText(url).then(function() {
+          btn.textContent = "Copied!";
+          setTimeout(() => btn.textContent = "Copy", 1500);
+        }, function() {
+          btn.textContent = "Failed to copy";
+        });
+      }
+    </script>
   </body>
 </html>
