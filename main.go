@@ -35,6 +35,12 @@ func main() {
 		return
 	}
 
+	PORT := os.Getenv("PORT")
+	if PORT == "" {
+		log.Println("PORT environment variable is not set, defaulting to 8080")
+		PORT = "8080"
+	}
+
 	db, db_err := sql.Open("sqlite3", "./urls.db")
 	if db_err != nil {
 		log.Fatal("Error opening database:", db_err)
@@ -84,7 +90,7 @@ func main() {
 
 	// Put endpoints above server start
 	srv := http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + PORT,
 		Handler: router,
 	}
 
