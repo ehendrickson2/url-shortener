@@ -15,8 +15,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-/* PageData holds data to be passed to templates
-Look into putting structs into project_root/models/ */
+/*
+	PageData holds data to be passed to templates
+
+Look into putting structs into project_root/models/
+*/
 type PageData struct {
 	ShortenedURL string
 }
@@ -25,6 +28,12 @@ func main() {
 	env_err := godotenv.Load()
 	if env_err != nil {
 		log.Fatal("Error loading .env file")
+	}
+
+	DOMAIN := os.Getenv("DOMAIN")
+	if DOMAIN == "" {
+		log.Println("DOMAIN environment variable is not set")
+		return
 	}
 
 	db, db_err := sql.Open("sqlite3", "./urls.db")
@@ -44,7 +53,7 @@ func main() {
 		log.Fatal("Error creating table:", table_err)
 	}
 	log.Println("Database and table initialized.")
-	
+
 	// Load templates
 	tmpl := template.Must(template.New("").ParseGlob("templates/*.html"))
 
@@ -56,7 +65,6 @@ func main() {
 
 	router.HandleFunc("/shorten", func(writer http.ResponseWriter, req *http.Request) {
 		// Shorten the provided URL, store it and return it to our UI
-		DOMAIN := os.Getenv("DOMAIN")
 		req.ParseForm()
 		url := req.FormValue("url")
 		if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
@@ -64,7 +72,7 @@ func main() {
 		}
 		shortened, err := utils.ShortenURL(url)
 		if err != nil {
-			http.Error(writer, "Failed to shorten URL: " + err.Error(), http.StatusBadRequest)
+			http.Error(writer, "Failed to shorten URL: "+err.Error(), http.StatusBadRequest)
 			return
 		}
 		url = DOMAIN + "/" + shortened
@@ -87,5 +95,5 @@ func main() {
 	if serv_err != nil && !errors.Is(serv_err, http.ErrServerClosed) {
 		log.Fatal("Error starting server:", serv_err)
 	}
-	
+
 }
