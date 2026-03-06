@@ -33,6 +33,20 @@ type shortenResponse struct {
 	ShortURL string `json:"short_url"`
 }
 
+func normalizeConfiguredBaseURL(raw string) string {
+	base := strings.TrimSpace(raw)
+	base = strings.TrimSuffix(base, "/")
+	if base == "" {
+		return ""
+	}
+
+	if !strings.HasPrefix(base, "http://") && !strings.HasPrefix(base, "https://") {
+		base = "https://" + base
+	}
+
+	return base
+}
+
 func normalizeURL(rawURL string) string {
 	url := strings.TrimSpace(rawURL)
 	if url == "" {
@@ -98,12 +112,15 @@ func main() {
 		log.Println("No .env file found, using environment variables")
 	}
 
-	baseURL := strings.TrimSuffix(os.Getenv("BASE_URL"), "/")
+	baseURL := normalizeConfiguredBaseURL(os.Getenv("BASE_URL"))
+	baseURLSource := "BASE_URL"
 	if baseURL == "" {
-		baseURL = strings.TrimSuffix(os.Getenv("DOMAIN"), "/")
+		baseURL = normalizeConfiguredBaseURL(os.Getenv("DOMAIN"))
+		baseURLSource = "DOMAIN"
 	}
 	if baseURL == "" {
-		baseURL = strings.TrimSuffix(os.Getenv("RENDER_EXTERNAL_URL"), "/")
+		baseURL = normalizeConfiguredBaseURL(os.Getenv("RENDER_EXTERNAL_URL"))
+		baseURLSource = "RENDER_EXTERNAL_URL"
 	}
 
 	allowedOrigins := parseAllowedOrigins(os.Getenv("CORS_ORIGINS"))
@@ -216,6 +233,12 @@ func main() {
 	srv := http.Server{
 		Addr:    ":" + PORT,
 		Handler: router,
+	}
+
+	if baseURL != "" {
+		log.Printf("Public base URL configured from %s: %s", baseURLSource, baseURL)
+	} else {
+		log.Println("No BASE_URL/DOMAIN/RENDER_EXTERNAL_URL configured, deriving public URL from request host")
 	}
 
 	log.Println("Server is running at", buildPublicBaseURL(nil, baseURL))
